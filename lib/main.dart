@@ -1,28 +1,20 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import 'app/data/app_colors.dart';
-import 'app/data/app_fonts.dart';
 import 'app/data/theme_data_class.dart';
-
-import 'app/modules/home/pokeman_detail_model.dart';
+import 'app/models/name_model_model.dart';
 import 'app/routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
-  Hive.registerAdapter(PokemanDetaisAdapter());
+  Hive.registerAdapter(PokemonAdapter());
 
   await Hive.openBox('MyFavorites');
   runApp(
-    MyApp(),
+    const MyApp(),
   );
 }
 
@@ -35,7 +27,7 @@ class MyApp extends StatelessWidget {
       designSize: Size(
           MediaQuery.sizeOf(context).width, MediaQuery.sizeOf(context).height),
       minTextAdapt: true,
-      child: MainPage(),
+      child: const MainPage(),
     );
   }
 }

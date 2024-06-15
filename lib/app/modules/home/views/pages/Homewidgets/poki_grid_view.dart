@@ -1,25 +1,24 @@
+import 'package:assignment/app/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:get/get.dart';
 
-import '../controllers/home_controller.dart';
-import 'detailsview_view.dart';
+import '../../detailsview_view.dart';
 
 class PokiGridView extends GetView {
-  PokiGridView({
-    Key? key,
+  const PokiGridView({
+    super.key,
     required this.allPokemonDetails,
-  }) : super(key: key);
+  });
   final List allPokemonDetails;
 
-  final HomeController controller = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
       addAutomaticKeepAlives: true,
       shrinkWrap: true,
-      padding: EdgeInsets.only(top: 16, left: 12, right: 12),
+      padding: const EdgeInsets.only(top: 16, left: 12, right: 12, bottom: 20).w,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         mainAxisExtent: 186.w,
         crossAxisCount: 3,
@@ -33,14 +32,14 @@ class PokiGridView extends GetView {
 
         return GestureDetector(
           onTap: () {
-            Get.to(
-              () => DetailsviewView(),
-              arguments: [
-                pokidetails,
-                controller.getTypeColor(list),
-                controller.formatNumberWithLeadingZeros(index + 1, 3),
-              ],
-            );
+            Get.to(() => const DetailsviewView(),
+                arguments: [
+                  pokidetails,
+                  AppUtils.getTypeColor(list),
+                  AppUtils.formatNumberWithLeadingZeros(index + 1, 3),
+                ],
+                transition: Transition.circularReveal,
+                duration: const Duration(seconds: 1));
           },
           child: Container(
             decoration: BoxDecoration(
@@ -52,7 +51,7 @@ class PokiGridView extends GetView {
               children: [
                 Center(
                   child: Container(
-                    color: controller.getTypeColor(list),
+                    color: AppUtils.getTypeColor(list),
                     height: 104,
                     width: double.infinity,
                     alignment: Alignment.center,
@@ -73,29 +72,19 @@ class PokiGridView extends GetView {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "#" +
-                            controller.formatNumberWithLeadingZeros(
-                                index + 1, 3),
+                        "#${AppUtils.formatNumberWithLeadingZeros(
+                                pokidetails.id, 3)}",
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       SizedBox(height: 2.h),
                       Text(
-                        controller.capitalizeFirstLetter(pokidetails.name),
+                        AppUtils.capitalizeFirstLetter(pokidetails.name),
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       SizedBox(height: 10.h),
                       Row(
-                        children: List.generate(
-                          list.length,
-                          (v) => Text(
-                            controller.capitalizeFirstLetter(
-                                    list[v]['type']['name']) +
-                                "${v == 0 && list.length > 1 ? "," : ""}" +
-                                ' ',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ),
-                      ),
+                          children:
+                              AppUtils.generateTypeTextListCard(context, list)),
                     ],
                   ),
                 ),

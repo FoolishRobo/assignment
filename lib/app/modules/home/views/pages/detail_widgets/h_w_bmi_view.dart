@@ -4,8 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class HWBmiView extends GetView {
-  const HWBmiView({Key? key, required this.title, required this.value})
-      : super(key: key);
+  const HWBmiView({super.key, required this.title, required this.value});
   final String title;
   final String value;
   @override

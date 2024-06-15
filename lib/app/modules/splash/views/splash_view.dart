@@ -1,3 +1,4 @@
+import 'package:assignment/app/data/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -7,10 +8,11 @@ import '../../../data/app_colors.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {
-  SplashView({Key? key}) : super(key: key);
-  var c = Get.put(SplashController());
+ const SplashView({super.key});
+
   @override
   Widget build(BuildContext context) {
+    var c = Get.put(SplashController());
     return Scaffold(
       backgroundColor: AppColors.blue,
       body: Row(
@@ -20,7 +22,7 @@ class SplashView extends GetView<SplashController> {
             height: 75.h,
             width: 75.w,
             child: Image.asset(
-              'assets/images/ball.png',
+              AppImages.ball,
             ),
           ),
           SizedBox(

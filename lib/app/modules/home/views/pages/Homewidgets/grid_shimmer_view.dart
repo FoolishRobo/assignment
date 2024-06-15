@@ -5,13 +5,13 @@ import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
 class GridShimmerView extends GetView {
-  const GridShimmerView({Key? key}) : super(key: key);
+  const GridShimmerView({super.key});
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
                         addAutomaticKeepAlives: true,
                         shrinkWrap: true,
-                        padding: EdgeInsets.only(top: 16, left: 12, right: 12),
+                        padding: const EdgeInsets.only(top: 16, left: 12, right: 12),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           mainAxisExtent: 186.w,
                           crossAxisCount: 3,

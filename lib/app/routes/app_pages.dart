@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/internetcheck/bindings/internetcheck_binding.dart';
+import '../modules/internetcheck/views/internetcheck_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/tabbar_page/bindings/tabbar_page_binding.dart';
@@ -29,6 +31,11 @@ class AppPages {
       name: _Paths.TABBAR_PAGE,
       page: () => TabbarPageView(),
       binding: TabbarPageBinding(),
+    ),
+    GetPage(
+      name: _Paths.INTERNETCHECK,
+      page: () => const InternetcheckView(),
+      binding: InternetcheckBinding(),
     ),
   ];
 }

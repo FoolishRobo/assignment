@@ -15,7 +15,7 @@ class ThemeDataClass {
         indicatorSize: TabBarIndicatorSize.tab,
         indicator: BoxDecoration(
           color: AppColors.blue,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(4),
                   topRight: Radius.circular(4),
                   bottomLeft: Radius.circular(0),

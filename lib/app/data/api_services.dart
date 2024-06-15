@@ -1,8 +1,7 @@
+import 'package:assignment/app/models/name_model_model.dart';
+import 'package:assignment/app/models/pokeman_detail_model.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-
-import '../models/name_model.dart';
-import '../modules/home/pokeman_detail_model.dart';
 
 class ApiService {
   static const String baseUrl = 'https://pokeapi.co/api/v2';
@@ -10,7 +9,6 @@ class ApiService {
   static Future<List<Pokemon>> fetchPokemonsname(int limit, int offset) async {
     final dio = Dio(); // Create a Dio instance
     final url = '$baseUrl/pokemon?limit=$limit&offset=$offset';
-
     try {
       final response = await dio.get(url);
 
@@ -24,15 +22,30 @@ class ApiService {
       throw Exception('API error: ${e.message}');
     }
   }
- static Future<List<PokemanDetais>> fetchAllPokemonDetails(RxList pokemons) async {
+
+  static Future<List<PokemanDetais>> fetchAllPokemonDetails(
+      RxList pokemons) async {
     List<PokemanDetais> allPokemonDetails = [];
     for (var pokemon in pokemons) {
       PokemanDetais details = await ApiService.fetchPokemon(pokemon.name);
+
       allPokemonDetails.add(details);
     }
     return allPokemonDetails;
   }
- static Future<PokemanDetais> fetchPokemon(String name) async {
+
+  static Future<List<PokemanDetais>> fetchfavPokemonDetails(
+      List pokemons) async {
+    List<PokemanDetais> allPokemonDetails = [];
+    for (var pokemon in pokemons) {
+      PokemanDetais details = await ApiService.fetchPokemon(pokemon);
+
+      allPokemonDetails.add(details);
+    }
+    return allPokemonDetails;
+  }
+
+  static Future<PokemanDetais> fetchPokemon(String name) async {
     final dio = Dio(); // Create a Dio instance
     final url = 'https://pokeapi.co/api/v2/pokemon/$name';
 
@@ -44,7 +57,7 @@ class ApiService {
       } else {
         throw Exception('Failed to fetch pokemon');
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       throw Exception('API error: ${e.message}');
     }
   }

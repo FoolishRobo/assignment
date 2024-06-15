@@ -18,6 +18,7 @@ class PokemanDetaisAdapter extends TypeAdapter<PokemanDetais> {
     };
     return PokemanDetais(
       name: fields[0] as String,
+      id: fields[6] as int,
       image: fields[1] as String,
       types: (fields[2] as List).cast<dynamic>(),
       height: fields[4] as int,
@@ -29,7 +30,7 @@ class PokemanDetaisAdapter extends TypeAdapter<PokemanDetais> {
   @override
   void write(BinaryWriter writer, PokemanDetais obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class PokemanDetaisAdapter extends TypeAdapter<PokemanDetais> {
       ..writeByte(4)
       ..write(obj.height)
       ..writeByte(5)
-      ..write(obj.weight);
+      ..write(obj.weight)
+      ..writeByte(6)
+      ..write(obj.id);
   }
 
   @override

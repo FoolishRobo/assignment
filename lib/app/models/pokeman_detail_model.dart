@@ -14,10 +14,13 @@ class PokemanDetais {
   int height;
   @HiveField(5)
   int weight;
+  @HiveField(6)
+  int id;
 
 
   PokemanDetais({
     required this.name,
+    required this.id,
     required this.image,
     required this.types,
     required this.height,
@@ -28,6 +31,7 @@ class PokemanDetais {
   factory PokemanDetais.fromJson(Map<String, dynamic> json) {
     return PokemanDetais(
       name: json['name'],
+      id: json['id'],
       image: json['sprites']['other']['official-artwork']['front_default'],
       types: json['types'],
       base_stats: json['stats'],

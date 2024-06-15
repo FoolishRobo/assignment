@@ -6,6 +6,7 @@ abstract class Routes {
   static const HOME = _Paths.HOME;
   static const SPLASH = _Paths.SPLASH;
   static const TABBAR_PAGE = _Paths.TABBAR_PAGE;
+  static const INTERNETCHECK = _Paths.INTERNETCHECK;
 }
 
 abstract class _Paths {
@@ -13,4 +14,5 @@ abstract class _Paths {
   static const HOME = '/home';
   static const SPLASH = '/splash';
   static const TABBAR_PAGE = '/tabbar-page';
+  static const INTERNETCHECK = '/internetcheck';
 }
