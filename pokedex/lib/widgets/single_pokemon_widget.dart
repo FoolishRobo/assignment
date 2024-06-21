@@ -28,8 +28,8 @@ class _SinglePokemonWidgetState extends State<SinglePokemonWidget> {
   bool isLoading = false;
   @override
   void initState() {
-    super.initState();
     getPokemonData();
+    super.initState();
   }
 
   getTypes() {
@@ -95,56 +95,59 @@ class _SinglePokemonWidgetState extends State<SinglePokemonWidget> {
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.3,
         margin: const EdgeInsets.all(5),
         color: const Color.fromRGBO(243, 249, 239, 1),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(
-              fit: BoxFit.cover,
-              widget.img ?? pokemonData['sprites']['front_default'],
-              height: MediaQuery.of(context).size.width * 0.3,
-              width: MediaQuery.of(context).size.width * 0.3,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text(
-                widget.id,
-                style: const TextStyle(
-                  color: Color.fromRGBO(107, 107, 107, 1),
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
-                ),
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.network(
+                    fit: BoxFit.cover,
+                    widget.img ?? pokemonData['sprites']['front_default'],
+                    height: MediaQuery.of(context).size.width * 0.3,
+                    width: MediaQuery.of(context).size.width * 0.3,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text(
+                      widget.id,
+                      style: const TextStyle(
+                        color: Color.fromRGBO(107, 107, 107, 1),
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 10,
+                      bottom: 10,
+                    ),
+                    child: Text(
+                      widget.title,
+                      style: const TextStyle(
+                        color: Color.fromRGBO(0, 0, 0, 0.87),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text(
+                      types,
+                      style: const TextStyle(
+                        color: Color.fromRGBO(107, 107, 107, 1),
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 10,
-                bottom: 10,
-              ),
-              child: Text(
-                widget.title,
-                style: const TextStyle(
-                  color: Color.fromRGBO(0, 0, 0, 0.87),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Text(
-                types,
-                style: const TextStyle(
-                  color: Color.fromRGBO(107, 107, 107, 1),
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

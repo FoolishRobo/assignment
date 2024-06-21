@@ -18,23 +18,26 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
   List pokemons = [];
   List favourites = [];
   bool isLoadingMore = false;
+  bool isLoading = false;
+  int c = 0;
   var previous;
   int countOfPagesLoaded = 0;
   ScrollController scrollController = ScrollController();
   @override
   void initState() {
-    super.initState();
     scrollController = ScrollController()..addListener(_onScrolledMore);
     fetchPokemons();
+    super.initState();
   }
 
   Future<void> fetchPokemons() async {
+    if (pokemons.isNotEmpty) return;
     setState(() {
-      isLoadingMore = true;
+      isLoading = true;
     });
     final response = await http.get(
       Uri.parse(
-        'https://pokeapi.co/api/v2/pokemon/',
+        'https://pokeapi.co/api/v2/pokemon/?limit=500',
       ),
     );
     if (response.statusCode == 200) {
@@ -44,11 +47,11 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
       final sf = await SharedPreferences.getInstance();
       await sf.setStringList('ids', ['-1']);
       setState(() {
-        isLoadingMore = false;
+        isLoading = false;
       });
     } else {
       setState(() {
-        isLoadingMore = false;
+        isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -106,118 +109,124 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
           height: 40,
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const Divider(
-              height: 2,
-              color: Color.fromRGBO(0, 0, 0, 0.05),
-            ),
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    if (isFavourite) {
-                      setState(() {
-                        isFavourite = !isFavourite;
-                      });
-                    }
-                  },
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: Text(
-                            'All Pokemons',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                              color: isFavourite
-                                  ? const Color.fromRGBO(107, 107, 107, 1)
-                                  : const Color.fromRGBO(22, 26, 51, 1),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: 5,
-                          width: size.width * 0.5,
-                          decoration: BoxDecoration(
-                            color: isFavourite == false
-                                ? const Color.fromRGBO(53, 88, 205, 1)
-                                : Colors.white,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(4),
-                              topRight: Radius.circular(4),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    if (isFavourite == false) {
-                      setState(() {
-                        isFavourite = !isFavourite;
-                      });
-                    }
-                  },
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Favourites  ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                  color: isFavourite == false
-                                      ? const Color.fromRGBO(107, 107, 107, 1)
-                                      : const Color.fromRGBO(22, 26, 51, 1),
-                                ),
-                              ),
-                              CircleAvatar(
-                                radius: 12,
-                                backgroundColor: Color.fromRGBO(53, 88, 205, 1),
-                                child: Text(
-                                  ids.length.toString(),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12,
-                                    color: Color.fromRGBO(255, 255, 255, 1),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          height: 5,
-                          width: size.width * 0.5,
-                          decoration: BoxDecoration(
+      body: Column(
+        children: [
+          const Divider(
+            height: 2,
+            color: Color.fromRGBO(0, 0, 0, 0.05),
+          ),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  if (isFavourite) {
+                    setState(() {
+                      isFavourite = !isFavourite;
+                    });
+                  }
+                },
+                child: Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          'All Pokemons',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
                             color: isFavourite
-                                ? const Color.fromRGBO(53, 88, 205, 1)
-                                : Colors.white,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(4),
-                              topRight: Radius.circular(4),
-                            ),
+                                ? const Color.fromRGBO(107, 107, 107, 1)
+                                : const Color.fromRGBO(22, 26, 51, 1),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      Container(
+                        height: 5,
+                        width: size.width * 0.5,
+                        decoration: BoxDecoration(
+                          color: isFavourite == false
+                              ? const Color.fromRGBO(53, 88, 205, 1)
+                              : Colors.white,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4),
+                            topRight: Radius.circular(4),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            ListView.builder(
+              ),
+              GestureDetector(
+                onTap: () {
+                  if (isFavourite == false) {
+                    setState(() {
+                      isFavourite = !isFavourite;
+                    });
+                  }
+                },
+                child: Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Favourites  ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: isFavourite == false
+                                    ? const Color.fromRGBO(107, 107, 107, 1)
+                                    : const Color.fromRGBO(22, 26, 51, 1),
+                              ),
+                            ),
+                            CircleAvatar(
+                              radius: 12,
+                              backgroundColor:
+                                  const Color.fromRGBO(53, 88, 205, 1),
+                              child: Text(
+                                ids.length.toString(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12,
+                                  color: Color.fromRGBO(255, 255, 255, 1),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 5,
+                        width: size.width * 0.5,
+                        decoration: BoxDecoration(
+                          color: isFavourite
+                              ? const Color.fromRGBO(53, 88, 205, 1)
+                              : Colors.white,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(4),
+                            topRight: Radius.circular(4),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: size.height - size.height * 0.2,
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisExtent: 200,
+              ),
               padding: EdgeInsets.zero,
               shrinkWrap: true,
               controller: scrollController,
@@ -232,11 +241,12 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => PokemonScreen(
-                              id: index + 1,
+                              id: ids[index].toString(),
+                              count: c,
                             ),
                           ),
                         ),
-                        id: (index + 1).toString(),
+                        id: ids[index].toString(),
                         title: names[index],
                         img: images[index],
                       )
@@ -245,7 +255,8 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
                             onTap: () => Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => PokemonScreen(
-                                  id: index + 1,
+                                  id: (index + 1).toString(),
+                                  count: c,
                                 ),
                               ),
                             ),
@@ -257,8 +268,8 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
                           );
               },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

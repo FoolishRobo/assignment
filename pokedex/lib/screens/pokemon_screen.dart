@@ -1,18 +1,19 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pokedex/widgets/single_stats_widget.dart';
 import 'package:pokedex/widgets/weight_widget.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../data_sources/local/data.dart';
 
 class PokemonScreen extends StatefulWidget {
-  final int id;
+  final String id;
+  final int count;
   const PokemonScreen({
     super.key,
     required this.id,
+    required this.count,
   });
 
   @override
@@ -94,11 +95,15 @@ class _PokemonScreenState extends State<PokemonScreen> {
     }
   }
 
-  checkData() {
+  checkData() async {
     setState(() {
       isLoading = true;
     });
+    int count = widget.count;
+    final sf = await SharedPreferences.getInstance();
     if (ids.contains(widget.id.toString())) {
+      await sf.remove(widget.id);
+      await sf.setInt('idc', count - 1);
       ids.remove(widget.id.toString());
       names.remove(pokemonData['name']);
       type.remove(types);
@@ -108,6 +113,8 @@ class _PokemonScreenState extends State<PokemonScreen> {
         isLoading = false;
       });
     } else {
+      await sf.setString(widget.id, widget.id);
+      await sf.setInt('idc', count + 1);
       ids.add(widget.id.toString());
       names.add(pokemonData['name']);
       type.add(types);
