@@ -2,18 +2,17 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pokedex/data_sources/local/data.dart';
+import 'package:pokedex/models/pokemon_model.dart';
+import 'package:pokedex/services/sql_service.dart';
 import 'package:pokedex/widgets/single_stats_widget.dart';
 import 'package:pokedex/widgets/weight_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../data_sources/local/data.dart';
 
 class PokemonScreen extends StatefulWidget {
   final String id;
-  final int count;
   const PokemonScreen({
     super.key,
     required this.id,
-    required this.count,
   });
 
   @override
@@ -22,6 +21,7 @@ class PokemonScreen extends StatefulWidget {
 
 class _PokemonScreenState extends State<PokemonScreen> {
   var pokemonData;
+  PokemonModel? pokemonModel;
   var types = '';
   var avg;
   bool isLoading = false;
@@ -32,14 +32,31 @@ class _PokemonScreenState extends State<PokemonScreen> {
     getPokemonData();
   }
 
-  getTypes() {
+  getTypes() async {
+    final pokemons = favPokemons;
     if (pokemonData['types'] != null) {
-      print(pokemonData['types']);
       for (var i = 0; i < pokemonData['types']?.length; i++) {
         types =
             '$types${i == 0 ? '' : ','}${pokemonData['types'][i]['type']['name']}';
       }
     }
+    setState(() {});
+    pokemonModel = PokemonModel(
+      id: int.tryParse(widget.id) ?? -1,
+      title: pokemonData['name'],
+      subtitle: types,
+      image: pokemonData['sprites']['front_default'],
+    );
+    setState(() {});
+    final p = pokemons.where((p) => p.id == int.tryParse(widget.id)).toList();
+    if (p.isNotEmpty) {
+      isFavourite = true;
+    } else {
+      isFavourite = false;
+    }
+
+    setState(() {});
+    print(isFavourite);
   }
 
   getPokemonData() async {
@@ -60,12 +77,7 @@ class _PokemonScreenState extends State<PokemonScreen> {
             pokemonData['stats'][3]['base_stat'] +
             pokemonData['stats'][4]['base_stat'] +
             pokemonData['stats'][5]['base_stat'];
-        if (ids.contains(widget.id.toString())) {
-          setState(() {
-            isFavourite = true;
-          });
-        }
-        getTypes();
+        await getTypes();
         setState(() {
           isLoading = false;
         });
@@ -95,35 +107,49 @@ class _PokemonScreenState extends State<PokemonScreen> {
     }
   }
 
-  checkData() async {
+  checkData(PokemonModel pokemon) async {
     setState(() {
       isLoading = true;
     });
-    int count = widget.count;
-    final sf = await SharedPreferences.getInstance();
-    if (ids.contains(widget.id.toString())) {
-      await sf.remove(widget.id);
-      await sf.setInt('idc', count - 1);
-      ids.remove(widget.id.toString());
-      names.remove(pokemonData['name']);
-      type.remove(types);
-      images.remove(pokemonData['sprites']['front_default']);
-      setState(() {
-        isFavourite = false;
-        isLoading = false;
-      });
+    final sqlService = SqlService.instance;
+    List fav = await sqlService.queryAll();
+    if (fav.contains(pokemon)) {
+      await sqlService.delete(pokemon.id);
+      favPokemons.remove(pokemon);
+      isFavourite = false;
     } else {
-      await sf.setString(widget.id, widget.id);
-      await sf.setInt('idc', count + 1);
-      ids.add(widget.id.toString());
-      names.add(pokemonData['name']);
-      type.add(types);
-      images.add(pokemonData['sprites']['front_default']);
-      setState(() {
-        isFavourite = true;
-        isLoading = false;
-      });
+      await sqlService.insert(pokemon);
+      favPokemons.add(pokemon);
+      isFavourite = true;
     }
+    // int count = widget.count;
+    // final sf = await SharedPreferences.getInstance();
+    // if (ids.contains(widget.id.toString())) {
+    //   await sf.remove(widget.id);
+    //   await sf.setInt('idc', count - 1);
+    //   ids.remove(widget.id.toString());
+    //   names.remove(pokemonData['name']);
+    //   type.remove(types);
+    //   images.remove(pokemonData['sprites']['front_default']);
+    //   setState(() {
+    //     isFavourite = false;
+    //     isLoading = false;
+    //   });
+    // } else {
+    //   await sf.setString(widget.id, widget.id);
+    //   await sf.setInt('idc', count + 1);
+    //   ids.add(widget.id.toString());
+    //   names.add(pokemonData['name']);
+    //   type.add(types);
+    //   images.add(pokemonData['sprites']['front_default']);
+    //   setState(() {
+    //     isFavourite = true;
+    //     isLoading = false;
+    //   });
+    // }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -318,7 +344,7 @@ class _PokemonScreenState extends State<PokemonScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(36),
                 ),
-                onPressed: () => checkData(),
+                onPressed: () => checkData(pokemonModel!),
                 label: const Text(
                   'Remove from favourites',
                   style: TextStyle(
@@ -338,7 +364,7 @@ class _PokemonScreenState extends State<PokemonScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(36),
                 ),
-                onPressed: () => checkData(),
+                onPressed: () => checkData(pokemonModel!),
                 label: const Text(
                   'Mark as favourite',
                   style: TextStyle(

@@ -1,4 +1,3 @@
-List<String> ids = [];
-List<String> names = [];
-List<String> type = [];
-List<String> images = [];
+import '../../models/pokemon_model.dart';
+
+List<PokemonModel> favPokemons = [];

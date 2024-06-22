@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:pokedex/data_sources/local/data.dart';
-import 'package:pokedex/screens/pokemon_screen.dart';
-import 'package:pokedex/widgets/single_pokemon_widget.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pokedex/data_sources/local/data.dart';
+import 'package:pokedex/models/pokemon_model.dart';
+import 'package:pokedex/screens/pokemon_screen.dart';
+import 'package:pokedex/services/sql_service.dart';
+import 'package:pokedex/widgets/single_pokemon_widget.dart';
 
 class AllPokemonsScreen extends StatefulWidget {
   const AllPokemonsScreen({super.key});
@@ -16,7 +17,7 @@ class AllPokemonsScreen extends StatefulWidget {
 class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
   bool isFavourite = false;
   List pokemons = [];
-  List favourites = [];
+  List<PokemonModel> favourites = [];
   bool isLoadingMore = false;
   bool isLoading = false;
   int c = 0;
@@ -27,10 +28,21 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
   void initState() {
     scrollController = ScrollController()..addListener(_onScrolledMore);
     fetchPokemons();
+    setFavourites();
     super.initState();
   }
 
+  setFavourites() async {
+    final sqlService = SqlService.instance;
+    favourites = await sqlService.queryAll();
+    favPokemons = favourites;
+    print(favourites);
+    setState(() {});
+  }
+
   Future<void> fetchPokemons() async {
+    final sqlService = SqlService.instance;
+    await sqlService.initDb();
     if (pokemons.isNotEmpty) return;
     setState(() {
       isLoading = true;
@@ -44,8 +56,6 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
       previous = await json.decode(response.body)['results'];
       pokemons = pokemons + await json.decode(response.body)['results'];
       countOfPagesLoaded++;
-      final sf = await SharedPreferences.getInstance();
-      await sf.setStringList('ids', ['-1']);
       setState(() {
         isLoading = false;
       });
@@ -190,7 +200,7 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
                               backgroundColor:
                                   const Color.fromRGBO(53, 88, 205, 1),
                               child: Text(
-                                ids.length.toString(),
+                                favourites.length.toString(),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 12,
@@ -231,7 +241,7 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
               shrinkWrap: true,
               controller: scrollController,
               itemCount: isFavourite
-                  ? ids.length
+                  ? favourites.length
                   : isLoadingMore
                       ? pokemons.length + 1
                       : pokemons.length,
@@ -241,14 +251,13 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => PokemonScreen(
-                              id: ids[index].toString(),
-                              count: c,
+                              id: favourites[index].id.toString(),
                             ),
                           ),
                         ),
-                        id: ids[index].toString(),
-                        title: names[index],
-                        img: images[index],
+                        id: favourites[index].id.toString(),
+                        title: favourites[index].title,
+                        img: favourites[index].image,
                       )
                     : index < pokemons.length
                         ? SinglePokemonWidget(
@@ -256,7 +265,6 @@ class _AllPokemonsScreenState extends State<AllPokemonsScreen> {
                               MaterialPageRoute(
                                 builder: (context) => PokemonScreen(
                                   id: (index + 1).toString(),
-                                  count: c,
                                 ),
                               ),
                             ),
